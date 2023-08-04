@@ -93,28 +93,15 @@ nds!(a,body,t=0) = apply!(a) do i,x
     n[i]*WaterLily.kern(clamp(d,-1,1))
 end
 
-function ∮nds_try(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractBody,t=0) where {T,N}
-    nds!(df,body,t)
+function ∮nds_param(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractBody,t=0,sdf_func) where {T,N}
+    nds_param!(df,body,t,sdf_func)
     for i in 1:N
         @loop df[I,i] = df[I,i]*p[I] over I ∈ inside(p)
     end
     reshape(sum(df,dims=1:N),N) |> Array
 end
-nds!(a,body,t=0) = apply!(a) do i,x
-    d = body.sdf(x,t)
-    n = ForwardDiff.gradient(y -> body.sdf(y,t), x)
-    n[i]*WaterLily.kern(clamp(d,-1,1))
-end
-
-function ∮nds_wrong(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractArray{T},t=0) where {T,N}
-    nds!(df,body,t)
-    for i in 1:N
-        @loop df[I,i] = df[I,i]*p[I] over I ∈ inside(p)
-    end
-    reshape(sum(df,dims=1:N),N) |> Array
-end
-nds!(a,body,t=0) = apply!(a) do i,x
-    d = body.sdf(x,t)
-    n = ForwardDiff.gradient(y -> body.sdf(y,t), x)
+nds_param!(a,body,t=0,sdf_func) = apply!(a) do i,x
+    d = sdf_func(body,x,t)
+    n = ForwardDiff.gradient(y -> sdf_func(body,y,t), x)
     n[i]*WaterLily.kern(clamp(d,-1,1))
 end
