@@ -100,7 +100,7 @@ function ∮nds_param(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractB
     end
     reshape(sum(df,dims=1:N),N) |> Array
 end
-nds_param!(a,body,t=0,sdf_func) = apply!(a) do i,x
+nds_param!(a,body,sdf_func,t=0) = apply!(a) do i,x
     d = sdf_func(body,x,t)
     n = ForwardDiff.gradient(y -> sdf_func(body,y,t), x)
     n[i]*WaterLily.kern(clamp(d,-1,1))
