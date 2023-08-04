@@ -27,5 +27,5 @@ function λ₂!(dat,sim)                          # compute log10(-λ₂)
 end
 include("ThreeD_Plots.jl")
 @time makie_video!(sim,dat,λ₂!,name="TGV.mp4",duration=5) do obs
-    contour(obs,levels=[-3,-2,-1,0],alpha=0.1,isorange=0.5)
+    GLMakie.contour(obs,levels=[-3,-2,-1,0],alpha=0.1,isorange=0.5)
 end

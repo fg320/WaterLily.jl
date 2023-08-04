@@ -55,12 +55,12 @@ begin
 
     # Set up geometry viz
     geom = geom!(md,d,sim) |> Observable;
-    fig, _, _ = contour(geom, levels=[0], alpha=0.01)
+    fig, _, _ = GLMakie.contour(geom, levels=[0], alpha=0.01)
 
     #Set up flow viz
-    ω = ω!(md,d,sim) |> Observable;
-    volume!(ω, algorithm=:mip, colormap=:algae, colorrange=(1,10))
-    fig
+    # ω = ω!(md,d,sim) |> Observable;
+    # volume!(ω, algorithm=:mip, colormap=:algae, colorrange=(1,10))
+    display(fig)
 end
 
 # Loop in time
@@ -70,4 +70,8 @@ foreach(1:100) do frame
     sim_step!(sim,sim_time(sim)+0.05);
     geom[] = geom!(md,d,sim);
     ω[] = ω!(md,d,sim);
+    # contour!(geom, levels=[0], alpha=0.01)
+    volume!(ω, algorithm=:mip, colormap=:algae, colorrange=(1,10))
+    display(fig)
+    sleep(0.01)
 end

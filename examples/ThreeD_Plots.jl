@@ -4,6 +4,7 @@ function makie_video!(makie_plot,sim,dat,obs_update!;remeasure=false,name="file.
     # Set up viz data and figure
     obs = obs_update!(dat,sim) |> Observable;
     f = makie_plot(obs)
+    # display(f)
     
     # Run simulation and update figure data
     t₀ = round(sim_time(sim))
@@ -11,8 +12,12 @@ function makie_video!(makie_plot,sim,dat,obs_update!;remeasure=false,name="file.
     record(f, name, t; framerate, compression) do tᵢ
         sim_step!(sim,tᵢ;remeasure)
         obs[] = obs_update!(dat,sim)
+        # sleep(0.1);
         println("simulation ",round(Int,(tᵢ-t₀)/duration*100),"% complete")
     end
+    # f = makie_plot(obs)
+    # display(f)
+    # sleep(0.1)
     return f
 end
 
