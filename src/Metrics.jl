@@ -80,9 +80,33 @@ end
 
 Surface normal integral of field `p` over the `body`.
 """
-# function ∮nds(p::AbstractArray{T,N},df::AbstractArray{T},body::AutoBody,t=0) where {T,N}
-# function ∮nds(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractBody,t=0) where {T,N}
-function ∮nds(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractArray{T},t=0) where {T,N}
+function ∮nds(p::AbstractArray{T,N},df::AbstractArray{T},body::AutoBody,t=0) where {T,N}
+    nds!(df,body,t)
+    for i in 1:N
+        @loop df[I,i] = df[I,i]*p[I] over I ∈ inside(p)
+    end
+    reshape(sum(df,dims=1:N),N) |> Array
+end
+nds!(a,body,t=0) = apply!(a) do i,x
+    d = body.sdf(x,t)
+    n = ForwardDiff.gradient(y -> body.sdf(y,t), x)
+    n[i]*WaterLily.kern(clamp(d,-1,1))
+end
+
+function ∮nds_try(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractBody,t=0) where {T,N}
+    nds!(df,body,t)
+    for i in 1:N
+        @loop df[I,i] = df[I,i]*p[I] over I ∈ inside(p)
+    end
+    reshape(sum(df,dims=1:N),N) |> Array
+end
+nds!(a,body,t=0) = apply!(a) do i,x
+    d = body.sdf(x,t)
+    n = ForwardDiff.gradient(y -> body.sdf(y,t), x)
+    n[i]*WaterLily.kern(clamp(d,-1,1))
+end
+
+function ∮nds_wrong(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractArray{T},t=0) where {T,N}
     nds!(df,body,t)
     for i in 1:N
         @loop df[I,i] = df[I,i]*p[I] over I ∈ inside(p)
