@@ -94,7 +94,7 @@ nds!(a,body,t=0) = apply!(a) do i,x
 end
 
 function ∮nds_param(p::AbstractArray{T,N},df::AbstractArray{T},body::AbstractBody,sdf_func,t=0) where {T,N}
-    nds_param!(df,body,t,sdf_func)
+    nds_param!(df,body,sdf_func,t)
     for i in 1:N
         @loop df[I,i] = df[I,i]*p[I] over I ∈ inside(p)
     end
